@@ -1,4 +1,5 @@
 class Country:
-    def __init__(self, budget, morale):
+    def __init__(self, budget, need, growth):
         self.budget = budget
-        self.morale = morale
+        self.need = need
+        self.growth = growth
