@@ -19,7 +19,7 @@ class Game:
         self.totalpollution += rrc.damage
         country.growth += rrc.value
     
-    def round(self):
+    def play_round(self):
         self.take_turn(developing)
         self.take_turn(developed)
         self.gametime += 1
