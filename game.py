@@ -31,6 +31,7 @@ class Game:
         self.gametime = 0
         self.developing = Agents[0]
         self.developed = Agents[1]
+        self.threshold = 100000
     
     def take_turn(self, country):
         rrc = random.choice(self.rl)
@@ -61,9 +62,13 @@ class Game:
         self.take_turn(self.developing)
         self.take_turn(self.developed)
         self.gametime += 1
+
+    def fix_pollution(self, cost):
+        self.total_pollution -= cost*100
+        
 x = Game()
 
-while x.total_pollution < 1000000:
+while x.total_pollution < x.threshold:
     x.play_round()
     print(["Total Pollution: ", x.total_pollution])
     print(["Length of Game: ", x.gametime])
