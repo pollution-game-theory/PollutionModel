@@ -22,9 +22,9 @@ class Game:
     #r2 = electricity
     #r3 = nuclear
     def __init__(self,
-                  r1 = Resource(40,40,60,4,1,0),
-                  r2 = Resource(80,10,40,0,1,0),
-                  r3 = Resource(60,20,80,10,1,0),
+                  r1 = Resource("Coal",40,40,60,4,1,0),
+                  r2 = Resource("Wind/Solar",80,10,40,0,1,0),
+                  r3 = Resource("Nuclear",60,20,80,10,1,0),
                   countries = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)],
                   Taxman = Taxman(),
                   total_pollution = 0,
@@ -38,7 +38,6 @@ class Game:
         self.r2 = r2
         self.r3 = r3
         self.rl = [r1, r2, r3]
-        self.names = ["Coal" ,"Wind/Solar", "Nuclear"]
         self.total_pollution = total_pollution
         self.total_risk = total_risk
         self.catastrophes = catastrophes
@@ -119,7 +118,10 @@ class Game:
         
         while self.global_collapse == False and self.country_collapse == False:
             self.play_round()
-            print(["Current Resource Price: " + str(self.currentResPrices)])
+            print("Current Resource Prices:", end = " ")
+            for i in range(0, len(self.rl)):
+                print(self.rl[i].name, self.currentResPrices[i], end = " ")
+            print("")
             print(["Length of Game: " + str(self.gametime)])
             print(["Total Interventions: " + str(self.Taxman.interventionTally)])
             for i in range(0, len(self.countries)):
