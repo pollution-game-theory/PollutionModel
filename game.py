@@ -51,18 +51,17 @@ class Game:
         self.currentResPrices = [self.r1.value/(self.r1.cost + .01),self.r2.value/(self.r2.cost+.01),self.r3.value/(self.r3.cost+.01)]
     
     def take_turn(self, country):
-        self.country = country
         self.currentResPrices = [self.r1.value/(self.r1.cost),self.r2.value/(self.r2.cost+.01),self.r3.value/(self.r3.cost+.01)]
         #rrc now stands for round-resource-choice
         rrc = self.rl[self.currentResPrices.index(max(self.currentResPrices))]
         if rrc.unlock == 1:
-            if rrc.unlockcost > self.country.budget:
+            if rrc.unlockcost > country.budget:
                 print ("country can't pay for this resource")
                 return
-            self.country.budget -= rrc.unlockcost
+            country.budget -= rrc.unlockcost
             rrc.unlock = 0
-        x = self.country.need
-        self.country.budget += self.country.growth
+        x = country.need
+        country.budget += country.growth
         
         self.total_risk += rrc.crisisRisk
         if random.randint(0,200)< self.total_risk:
@@ -70,8 +69,8 @@ class Game:
             self.total_risk += -10
             self.catastrophes += 1
             
-        while x > -1 and self.country.budget > 0:
-            self.country.budget -= rrc.cost
+        while x > -1 and country.budget > 0:
+            country.budget -= rrc.cost
             x -= rrc.value
             self.total_pollution += rrc.damage
         if x > 0:
