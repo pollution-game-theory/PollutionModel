@@ -25,7 +25,7 @@ class Game:
                   r1 = Resource(40,40,60,4,1,0),
                   r2 = Resource(80,10,40,0,1,0),
                   r3 = Resource(60,20,80,10,1,0),
-                  Agents = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)],
+                  countries = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)],
                   Taxman = Taxman(),
                   total_pollution = 0,
                   total_risk = 0,
@@ -43,8 +43,7 @@ class Game:
         self.total_risk = total_risk
         self.catastrophes = catastrophes
         self.gametime = gametime
-        self.developing = Agents[0]
-        self.developed = Agents[1]
+        self.countries = countries
         self.Taxman = Taxman
         self.threshold = threshold
         self.global_collapse = global_collapse
@@ -101,9 +100,9 @@ class Game:
                     self.r2.cost = 80
                 self.Taxman.interventionInProgress = False
             
-                
-        self.take_turn(self.developing)
-        self.take_turn(self.developed)
+        for country in self.countries:
+            self.take_turn(country)
+        
         self.gametime += 1
 
     def fix_pollution(self, cost):
@@ -116,8 +115,8 @@ class Game:
             print(["Current Resource Price: " + str(self.currentResPrices)])
             print(["Length of Game: " + str(self.gametime)])
             print(["Total Interventions: " + str(self.Taxman.interventionTally)])
-            print(["Player1 budget: " + str(self.developing.budget)])
-            print(["Player2 budget: "+ str(self.developed.budget)])
+            for i in range(0, len(self.countries)):
+                print("Player", i, "budget:", self.countries[i].budget)
             print(["Total Global Pollution: " + str(self.total_pollution) + "/" + str(self.threshold)])
             print(["Current Total Global Risk: "+ str(self.total_risk)])
             print(["Total Global Crises :"+ str(self.catastrophes)])
