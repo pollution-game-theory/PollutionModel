@@ -48,10 +48,18 @@ class Game:
         self.threshold = threshold
         self.global_collapse = global_collapse
         self.country_collapse = country_collapse
-        self.currentResPrices = [self.r1.value/(self.r1.cost + .01),self.r2.value/(self.r2.cost+.01),self.r3.value/(self.r3.cost+.01)]
+        self.currentResPrices = self.get_r_prices()
+    
+    def get_r_prices(self):
+        def pd(n, d):
+            return n / d if d else n
+        r_prices = []
+        for r in self.rl:
+            r_prices.append(pd(r.value, r.cost))
+        return r_prices
     
     def take_turn(self, country):
-        self.currentResPrices = [self.r1.value/(self.r1.cost),self.r2.value/(self.r2.cost+.01),self.r3.value/(self.r3.cost+.01)]
+        self.currentResPrices = self.get_r_prices()
         #rrc now stands for round-resource-choice
         rrc = self.rl[self.currentResPrices.index(max(self.currentResPrices))]
         if rrc.unlock == 1:
