@@ -54,7 +54,7 @@ class Game:
             return n / d if d else n
         r_prices = []
         for r in self.rl:
-            r_prices.append(pd(r.value, r.cost))
+            r_prices.append(round(pd(r.value, r.cost), 3))
         return r_prices
     
     def take_turn(self, country):
@@ -122,13 +122,13 @@ class Game:
             for i in range(0, len(self.rl)):
                 print(self.rl[i].name, self.currentResPrices[i], end = " ")
             print("")
-            print(["Length of Game: " + str(self.gametime)])
-            print(["Total Interventions: " + str(self.Taxman.interventionTally)])
+            print("Length of Game:", self.gametime)
+            print("Total Interventions:", self.Taxman.interventionTally)
             for i in range(0, len(self.countries)):
                 print("Player", i, "budget:", self.countries[i].budget)
-            print(["Total Global Pollution: " + str(self.total_pollution) + "/" + str(self.threshold)])
-            print(["Current Total Global Risk: "+ str(self.total_risk)])
-            print(["Total Global Crises :"+ str(self.catastrophes)])
+            print("Total Global Pollution:", self.total_pollution, "/", self.threshold)
+            print("Current Total Global Risk:", self.total_risk)
+            print("Total Global Crises:", self.catastrophes)
             print("")
         if self.country_collapse == True:
             print("")
