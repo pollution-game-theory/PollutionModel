@@ -21,32 +21,20 @@ class Game:
     #r1 = coal
     #r2 = electricity
     #r3 = nuclear
-    def __init__(self,
-                  r1 = Resource("Coal",40,40,60,4,1,0),
-                  r2 = Resource("Wind/Solar",80,10,40,0,1,0),
-                  r3 = Resource("Nuclear",60,20,80,10,1,0),
-                  countries = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)],
-                  Taxman = Taxman(),
-                  total_pollution = 0,
-                  total_risk = 0,
-                  catastrophes = 0,
-                  gametime = 0,
-                  global_collapse = False,
-                  country_collapse = False,
-                  threshold = 1000000):
-        self.r1 = r1
-        self.r2 = r2
-        self.r3 = r3
-        self.rl = [r1, r2, r3]
-        self.total_pollution = total_pollution
-        self.total_risk = total_risk
-        self.catastrophes = catastrophes
-        self.gametime = gametime
-        self.countries = countries
-        self.Taxman = Taxman
-        self.threshold = threshold
-        self.global_collapse = global_collapse
-        self.country_collapse = country_collapse
+    def __init__(self):
+        self.r1 = Resource("Coal",40,40,60,4,1,0)
+        self.r2 = Resource("Wind/Solar",80,10,40,0,1,0)
+        self.r3 = Resource("Nuclear",60,20,80,10,1,0)
+        self.rl = [self.r1, self.r2, self.r3]
+        self.total_pollution = 0
+        self.total_risk = 0
+        self.catastrophes = 0
+        self.gametime = 0
+        self.countries = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)]
+        self.Taxman = Taxman()
+        self.threshold = 1000000
+        self.global_collapse = False
+        self.country_collapse = False
         self.currentResPrices = self.get_r_prices()
     
     def get_r_prices(self):
