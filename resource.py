@@ -1,6 +1,7 @@
 class Resource:
     
-    def __init__(self, cost, damage, value, crisisrisk, unlock, unlockcost):
+    def __init__(self, name, cost, damage, value, crisisrisk, unlock, unlockcost):
+        self.name = name
         self.cost = cost
         self.damage = damage
         self.value = value
