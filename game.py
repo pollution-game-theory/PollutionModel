@@ -1,7 +1,7 @@
 import random
-from country import Country
-from resource import Resource
-from taxman import Taxman
+import Country
+import Resource
+import Taxman
 
 class Game:
     #resource variables
