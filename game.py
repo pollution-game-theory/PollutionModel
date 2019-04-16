@@ -10,7 +10,7 @@ class Game:
     #value 3 = the value to the countries (i.e. how much it fills their need)
     #value 4 = the crisis risk
     #value 5 = unlock variable: some resources have a high initial cost and low subsequent cost. unlock of 1 means that there is an initial cost
-    #value 6 = unlock cost.
+    #value 6 = unlock cost (not used right now, so everything is set to 0).
 
     #country variables
     #value 1 = budget, value 2 = need, value 3 = growth
@@ -18,14 +18,11 @@ class Game:
     #the need is how much value they need per round (i.e. a country with a need of 200 would need 100 of a resource with the value 2 per round.
     #the growth is a steady value that gets added to the budget every round.
     
-    #r1 = coal
-    #r2 = electricity
-    #r3 = nuclear
     def __init__(self,
-                  r1 = Resource(40,40,60,4,1,0),
-                  r2 = Resource(80,10,40,0,1,0),
-                  r3 = Resource(60,20,80,10,1,0),
-                  Agents = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)],
+                  r1 = Resource(40,40,60,4,1,0), #coal
+                  r2 = Resource(80,10,40,0,1,0), #solar
+                  r3 = Resource(60,20,80,10,1,0),#nuclear
+                  Agents = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)], #developing, developed
                   Taxman = Taxman(),
                   total_pollution = 0,
                   total_risk = 0,
