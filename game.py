@@ -1,7 +1,7 @@
 import random
-from country import Country
-from resource import Resource
-from taxman import Taxman
+import Country
+import Resource
+import Taxman
 
 class Game:
     #resource variables
@@ -22,30 +22,31 @@ class Game:
     #r2 = electricity
     #r3 = nuclear
     def __init__(self):
-        self.r1 = Resource("Coal",40,40,60,4,1,0)
-        self.r2 = Resource("Wind/Solar",80,10,40,0,1,0)
-        self.r3 = Resource("Nuclear",60,20,80,10,1,0)
+        self.r1 = Resource("Coal",40,50,50,1,1,0)
+        self.r2 = Resource("Wind/Solar",90,0,30,0,1,0)
+        self.r3 = Resource("Nuclear",70,25,40,2,1,0)
         self.rl = [self.r1, self.r2, self.r3]
         self.total_pollution = 0
         self.total_risk = 0
         self.catastrophes = 0
         self.gametime = 0
-        self.countries = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)]
+        self.countries =[Country(25000, 1100, 1000),Country(10000, 300, 200)]
         self.Taxman = Taxman()
-        self.threshold = 1000000
+        self.threshold = 100000
         self.global_collapse = False
         self.country_collapse = False
         self.currentResPrices = self.get_r_prices()
     
     def get_r_prices(self):
         def pd(n, d):
-            return n / d if d else n
+            return (n / d) if d else n
         r_prices = []
         for r in self.rl:
             r_prices.append(round(pd(r.value, r.cost), 3))
         return r_prices
     
-    def take_turn(self, country):
+    def take_turn(self, country, supply, fullsupplycost1, fullsupplycost2, fullsupplycost3):
+        self.supply = supply
         self.currentResPrices = self.get_r_prices()
         #rrc now stands for round-resource-choice
         rrc = self.rl[self.currentResPrices.index(max(self.currentResPrices))]
@@ -59,12 +60,19 @@ class Game:
         country.budget += country.growth
         
         self.total_risk += rrc.crisisRisk
-        if random.randint(0,200)< self.total_risk:
-            self.total_pollution +=5000
+        if random.randint(0,100)< self.total_risk:
+            self.total_pollution +=10000
             self.total_risk += -10
             self.catastrophes += 1
             
         while x > -1 and country.budget > 0:
+            self.r1.cost = fullsupplycost1 * ((1000 -(.5*self.supply[0]))/500)* (random.randint(9,12)/10)
+            self.r2.cost = fullsupplycost2 * ((1000 -(.5*self.supply[1]))/500)* (random.randint(9,12)/10)
+            self.r3.cost = fullsupplycost3 * ((1000 -(.5*self.supply[2]))/500)* (random.randint(9,12)/10)
+            self.rl = [self.r1, self.r2, self.r3]
+            self.currentResPrices = self.get_r_prices()
+            rrc = self.rl[self.currentResPrices.index(max(self.currentResPrices))]
+            self.supply[self.currentResPrices.index(max(self.currentResPrices))] -= 1
             country.budget -= rrc.cost
             x -= rrc.value
             self.total_pollution += rrc.damage
@@ -91,12 +99,16 @@ class Game:
                 self.Taxman.interventionThreshold = self.total_pollution + self.Taxman.thresholdIncreaseRate
                 if self.Taxman.reset == True:
                     self.r1.cost = 40
-                    self.r2.cost = 80
+                    self.r2.cost = 90
                 self.Taxman.interventionInProgress = False
+        
+        fullsupplycost1,fullsupplycost2,fullsupplycost3 = self.r1.cost* (random.randint(9,12)/10),self.r2.cost* (random.randint(9,12)/10),self.r3.cost * (random.randint(9,12)/10)   
+        self.supply = [1000,1000,1000]
             
         for country in self.countries:
-            self.take_turn(country)
+            self.take_turn(country,self.supply,fullsupplycost1,fullsupplycost2,fullsupplycost3)
         
+        self.r1.cost,self.r2.cost,self.r3.cost = fullsupplycost1* (random.randint(9,12)/10),fullsupplycost2* (random.randint(9,12)/10),fullsupplycost3* (random.randint(9,12)/10)
         self.gametime += 1
 
     def fix_pollution(self, cost):
@@ -124,6 +136,5 @@ class Game:
         if self.global_collapse == True:
             print("")
             print("Game Over: Global Collapse!")
-
 x = Game()
 x.playgame()
