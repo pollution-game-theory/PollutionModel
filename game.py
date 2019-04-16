@@ -10,7 +10,7 @@ class Game:
     #value 3 = the value to the countries (i.e. how much it fills their need)
     #value 4 = the crisis risk
     #value 5 = unlock variable: some resources have a high initial cost and low subsequent cost. unlock of 1 means that there is an initial cost
-    #value 6 = unlock cost (not used right now, so everything is set to 0).
+    #value 6 = unlock cost.
 
     #country variables
     #value 1 = budget, value 2 = need, value 3 = growth
@@ -18,58 +18,62 @@ class Game:
     #the need is how much value they need per round (i.e. a country with a need of 200 would need 100 of a resource with the value 2 per round.
     #the growth is a steady value that gets added to the budget every round.
     
-    def __init__(self,
-                  r1 = Resource(40,40,60,4,1,0), #coal
-                  r2 = Resource(80,10,40,0,1,0), #solar
-                  r3 = Resource(60,20,80,10,1,0),#nuclear
-                  Agents = [Country(100000, 8000, 10000),Country(1000000, 80000, 100000)], #developing, developed
-                  Taxman = Taxman(),
-                  total_pollution = 0,
-                  total_risk = 0,
-                  catastrophes = 0,
-                  gametime = 0,
-                  global_collapse = False,
-                  country_collapse = False,
-                  threshold = 1000000):
-        self.r1 = r1
-        self.r2 = r2
-        self.r3 = r3
-        self.rl = [r1, r2, r3]
-        self.names = ["Coal" ,"Wind/Solar", "Nuclear"]
-        self.total_pollution = total_pollution
-        self.total_risk = total_risk
-        self.catastrophes = catastrophes
-        self.gametime = gametime
-        self.developing = Agents[0]
-        self.developed = Agents[1]
-        self.Taxman = Taxman
-        self.threshold = threshold
-        self.global_collapse = global_collapse
-        self.country_collapse = country_collapse
-        self.currentResPrices = [self.r1.value/(self.r1.cost + .01),self.r2.value/(self.r2.cost+.01),self.r3.value/(self.r3.cost+.01)]
+    #r1 = coal
+    #r2 = electricity
+    #r3 = nuclear
+    def __init__(self):
+        self.r1 = Resource("Coal",40,50,50,1,1,0)
+        self.r2 = Resource("Wind/Solar",90,0,30,0,1,0)
+        self.r3 = Resource("Nuclear",70,25,40,2,1,0)
+        self.rl = [self.r1, self.r2, self.r3]
+        self.total_pollution = 0
+        self.total_risk = 0
+        self.catastrophes = 0
+        self.gametime = 0
+        self.countries =[Country(25000, 1100, 1000),Country(10000, 300, 200)]
+        self.Taxman = Taxman()
+        self.threshold = 100000
+        self.global_collapse = False
+        self.country_collapse = False
+        self.currentResPrices = self.get_r_prices()
     
-    def take_turn(self, country):
-        self.country = country
-        self.currentResPrices = [self.r1.value/(self.r1.cost),self.r2.value/(self.r2.cost+.01),self.r3.value/(self.r3.cost+.01)]
+    def get_r_prices(self):
+        def pd(n, d):
+            return (n / d) if d else n
+        r_prices = []
+        for r in self.rl:
+            r_prices.append(round(pd(r.value, r.cost), 3))
+        return r_prices
+    
+    def take_turn(self, country, supply, fullsupplycost1, fullsupplycost2, fullsupplycost3):
+        self.supply = supply
+        self.currentResPrices = self.get_r_prices()
         #rrc now stands for round-resource-choice
         rrc = self.rl[self.currentResPrices.index(max(self.currentResPrices))]
         if rrc.unlock == 1:
-            if rrc.unlockcost > self.country.budget:
+            if rrc.unlockcost > country.budget:
                 print ("country can't pay for this resource")
                 return
-            self.country.budget -= rrc.unlockcost
+            country.budget -= rrc.unlockcost
             rrc.unlock = 0
-        x = self.country.need
-        self.country.budget += self.country.growth
+        x = country.need
+        country.budget += country.growth
         
         self.total_risk += rrc.crisisRisk
-        if random.randint(0,200)< self.total_risk:
-            self.total_pollution +=5000
+        if random.randint(0,100)< self.total_risk:
+            self.total_pollution +=10000
             self.total_risk += -10
             self.catastrophes += 1
             
-        while x > -1 and self.country.budget > 0:
-            self.country.budget -= rrc.cost
+        while x > -1 and country.budget > 0:
+            self.r1.cost = fullsupplycost1 * ((1000 -(.5*self.supply[0]))/500)* (random.randint(9,12)/10)
+            self.r2.cost = fullsupplycost2 * ((1000 -(.5*self.supply[1]))/500)* (random.randint(9,12)/10)
+            self.r3.cost = fullsupplycost3 * ((1000 -(.5*self.supply[2]))/500)* (random.randint(9,12)/10)
+            self.rl = [self.r1, self.r2, self.r3]
+            self.currentResPrices = self.get_r_prices()
+            rrc = self.rl[self.currentResPrices.index(max(self.currentResPrices))]
+            self.supply[self.currentResPrices.index(max(self.currentResPrices))] -= 1
+            country.budget -= rrc.cost
             x -= rrc.value
             self.total_pollution += rrc.damage
         if x > 0:
@@ -95,12 +99,16 @@ class Game:
                 self.Taxman.interventionThreshold = self.total_pollution + self.Taxman.thresholdIncreaseRate
                 if self.Taxman.reset == True:
                     self.r1.cost = 40
-                    self.r2.cost = 80
+                    self.r2.cost = 90
                 self.Taxman.interventionInProgress = False
+        
+        fullsupplycost1,fullsupplycost2,fullsupplycost3 = self.r1.cost* (random.randint(9,12)/10),self.r2.cost* (random.randint(9,12)/10),self.r3.cost * (random.randint(9,12)/10)   
+        self.supply = [1000,1000,1000]
             
-                
-        self.take_turn(self.developing)
-        self.take_turn(self.developed)
+        for country in self.countries:
+            self.take_turn(country,self.supply,fullsupplycost1,fullsupplycost2,fullsupplycost3)
+        
+        self.r1.cost,self.r2.cost,self.r3.cost = fullsupplycost1* (random.randint(9,12)/10),fullsupplycost2* (random.randint(9,12)/10),fullsupplycost3* (random.randint(9,12)/10)
         self.gametime += 1
 
     def fix_pollution(self, cost):
@@ -110,14 +118,17 @@ class Game:
         
         while self.global_collapse == False and self.country_collapse == False:
             self.play_round()
-            print(["Current Resource Price: " + str(self.currentResPrices)])
-            print(["Length of Game: " + str(self.gametime)])
-            print(["Total Interventions: " + str(self.Taxman.interventionTally)])
-            print(["Player1 budget: " + str(self.developing.budget)])
-            print(["Player2 budget: "+ str(self.developed.budget)])
-            print(["Total Global Pollution: " + str(self.total_pollution) + "/" + str(self.threshold)])
-            print(["Current Total Global Risk: "+ str(self.total_risk)])
-            print(["Total Global Crises :"+ str(self.catastrophes)])
+            print("Current Resource Prices:", end = " ")
+            for i in range(0, len(self.rl)):
+                print(self.rl[i].name, self.currentResPrices[i], end = " ")
+            print("")
+            print("Length of Game:", self.gametime)
+            print("Total Interventions:", self.Taxman.interventionTally)
+            for i in range(0, len(self.countries)):
+                print("Player", i, "budget:", self.countries[i].budget)
+            print("Total Global Pollution:", self.total_pollution, "/", self.threshold)
+            print("Current Total Global Risk:", self.total_risk)
+            print("Total Global Crises:", self.catastrophes)
             print("")
         if self.country_collapse == True:
             print("")
@@ -125,6 +136,5 @@ class Game:
         if self.global_collapse == True:
             print("")
             print("Game Over: Global Collapse!")
-
 x = Game()
 x.playgame()

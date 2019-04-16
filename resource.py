@@ -5,8 +5,9 @@ class Resource:
     #value 3 = the value to the countries (i.e. how much it fills their need)
     #value 4 = the crisis risk
     #value 5 = unlock variable: some resources have a high initial cost and low subsequent cost. unlock of 1 means that there is an initial cost
-    #value 6 = unlock cost (not used right now, so everything is set to 0).
-    def __init__(self, cost, damage, value, crisisrisk, unlock, unlockcost):
+    #value 6 = unlock cost.
+    def __init__(self, name, cost, damage, value, crisisrisk, unlock, unlockcost):
+        self.name = name
         self.cost = cost
         self.damage = damage
         self.value = value
